@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0ea5e9" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/icon-192.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <title data-i18n="app.title">Sarathi — Kerala</title>
+
+    <!-- Leaflet & plugins -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <script
+      defer
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"
+    />
+    <script
+      defer
+      src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"
+    ></script>
+    <script
+      defer
+      src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"
+    ></script>
+
+    <!-- Inline styles moved to styles.css -->
+  </head>
+  <body class="homebg">
+    <div class="wrap">
+      <div class="app">
+        <div class="topbar">
+          <div class="brand">
+            <div class="logo">S</div>
+            <div class="title" data-i18n="app.brand">Sarathi</div>
+          </div>
+          <div class="lang" id="lang">
+            <div class="pill active" data-lang="en">EN</div>
+            <div class="pill" data-lang="ml">മലയാളം</div>
+          </div>
+        </div>
+
+        <div id="net" class="banner">Online</div>
+
+        <nav class="tabs" id="tabs">
+          <div class="tab active" data-tab="home" data-i18n="nav.home">
+            Home
+          </div>
+          <div class="tab" data-tab="mapSection" data-i18n="nav.map">Map</div>
+          <div class="tab" data-tab="public" data-i18n="nav.public">Public</div>
+          <div class="tab" data-tab="rider" data-i18n="nav.rider">Rider</div>
+          <div class="tab" data-tab="car" data-i18n="nav.car">Car</div>
+        </nav>
+
+        <!-- HOME -->
+        <section id="home">
+          <div class="card">
+            <h3 data-i18n="quick.title">Quick Destination</h3>
+            <div class="inline" style="margin-bottom: 8px">
+              <input
+                id="quickDest"
+                class="field"
+                list="destList"
+                data-i18n-placeholder="quick.placeholder"
+                placeholder="Enter destination…"
+              />
+              <button class="btn primary" id="goMap" data-i18n="quick.go">
+                Go
+              </button>
+            </div>
+            <datalist id="destList"></datalist>
+            <div class="small" data-i18n="quick.tip">
+              Tip: Add to Home Screen to install
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Public Transport — Next Services (demo)</h3>
+            <div id="metro"></div>
+          </div>
+
+          <div class="card">
+            <h3>Hotels</h3>
+            <div class="inline" style="margin-bottom: 8px">
+              <select id="area" class="field">
+                <option value="all">All Areas</option>
+              </select>
+              <input
+                id="budget"
+                class="field"
+                type="number"
+                min="1000"
+                step="100"
+                placeholder="Max ₹/night"
+              />
+            </div>
+            <div id="hotellist"></div>
+          </div>
+
+          <div class="inline">
+            <button class="btn warn" id="openSOS">SOS</button>
+            <button class="btn" id="toggleGuard">Guard Mode: OFF</button>
+          </div>
+        </section>
+
+        <!-- MAP SECTION (ID CHANGED) -->
+        <section id="mapSection" class="hidden">
+          <div class="card">
+            <h3>Destination Map & Heat</h3>
+            <div class="inline" style="margin-bottom: 8px">
+              <input
+                id="mapDest"
+                class="field"
+                list="destList"
+                placeholder="Search Kerala destination…"
+              />
+              <button class="btn primary" id="centerMap">Show</button>
+            </div>
+            <div id="poiChips" class="chips"></div>
+            <div id="mapView"></div>
+            <div class="small" style="margin-top: 6px">
+              Tap icons or map pins to review places.
+            </div>
+          </div>
+        </section>
+
+        <!-- PUBLIC -->
+        <section id="public" class="hidden">
+          <div class="card">
+            <h3>Public Transport (Bus / Metro / Train)</h3>
+            <div class="inline" style="margin-bottom: 8px">
+              <label class="radio"
+                ><input type="radio" name="mode" value="bus" checked />
+                Bus</label
+              >
+              <label class="radio"
+                ><input type="radio" name="mode" value="metro" /> Metro</label
+              >
+              <label class="radio"
+                ><input type="radio" name="mode" value="train" /> Train</label
+              >
+            </div>
+            <div class="inline" style="margin-bottom: 8px">
+              <select id="pt_from" class="field">
+                <option value="Ernakulam">Ernakulam</option>
+                <option value="Kochi">Kochi</option>
+                <option value="Thrissur">Thrissur</option>
+                <option value="Alappuzha">Alappuzha</option>
+                <option value="Trivandrum">Trivandrum</option>
+              </select>
+              <select id="pt_to" class="field">
+                <option value="Ernakulam">Ernakulam</option>
+                <option value="Kochi">Kochi</option>
+                <option value="Thrissur">Thrissur</option>
+                <option value="Alappuzha">Alappuzha</option>
+                <option value="Trivandrum">Trivandrum</option>
+              </select>
+              <button class="btn" id="swapPT">⇆</button>
+            </div>
+            <div class="inline" style="margin-bottom: 8px">
+              <button class="btn" id="ptPlan">Show Options</button>
+              <button class="btn primary" id="ptOnMap">Show on Map</button>
+            </div>
+            <div id="ptResults" class="small"></div>
+            <div style="margin-top: 8px; position: relative; z-index: 1">
+              <div
+                id="mapPT"
+                style="position: relative; z-index: 1; background: #fff"
+              ></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- RIDER -->
+        <section id="rider" class="hidden">
+          <div class="card">
+            <h3>Rider Safe Routes</h3>
+            <div id="routes"></div>
+            <div class="inline" style="margin-top: 8px">
+              <button class="btn warn" id="checkIn">Check-in (I’m OK)</button>
+              <a class="btn danger" href="tel:112">112</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- CAR -->
+        <section id="car" class="hidden">
+          <div class="card">
+            <h3>Private Vehicle</h3>
+            <div class="row">
+              • Keep fuel ≥ 1/4; avoid unknown hill roads at night.
+            </div>
+            <div class="row">
+              • Park in lit, manned lots; no valuables visible.
+            </div>
+            <div class="row">
+              • Breakdown: hazards → triangle → call assist → stay inside if
+              unsafe.
+            </div>
+          </div>
+        </section>
+
+        <nav class="bnav">
+          <div class="tab active" data-tab="home">🏠</div>
+          <div class="tab" data-tab="mapSection">🗺️</div>
+          <div class="tab" data-tab="public">🚌</div>
+          <div class="tab" data-tab="rider">🏍️</div>
+          <div class="tab" data-tab="car">🚗</div>
+        </nav>
+
+        <div class="small" style="margin-top: 8px">
+          © <span id="yr"></span> Sarathi
+        </div>
+      </div>
+    </div>
+
+    <!-- Load dependencies first -->
+    <script src="https://unpkg.com/dayjs@1.11.11/dayjs.min.js"></script>
+    <!-- Load i18n system first -->
+    <script src="i18n/index.js"></script>
+    <script src="i18n/en.js"></script>
+    <script src="i18n/ml.js"></script>
+    <script src="i18n/ui.js"></script>
+    <!-- Then load our application code -->
+    <script src="data.js"></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
